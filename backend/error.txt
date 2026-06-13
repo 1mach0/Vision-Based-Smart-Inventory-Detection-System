@@ -1,0 +1,150 @@
+INFO:     Started server process [22275]
+INFO:     Waiting for application startup.
+ERROR:    Traceback (most recent call last):
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 144, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 3319, in raw_connection
+    return self.pool.connect()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/base.py", line 448, in connect
+    return _ConnectionFairy._checkout(self)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/base.py", line 1272, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/base.py", line 712, in checkout
+    rec = pool._do_get()
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/impl.py", line 178, in _do_get
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/util/langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/impl.py", line 176, in _do_get
+    return self._create_connection()
+           ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/base.py", line 389, in _create_connection
+    return _ConnectionRecord(self)
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/base.py", line 674, in __init__
+    self.__connect()
+    ~~~~~~~~~~~~~~^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/base.py", line 900, in __connect
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/util/langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/base.py", line 896, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/engine/create.py", line 667, in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/psycopg/connection.py", line 130, in connect
+    raise new_ex.with_traceback(None)
+psycopg.OperationalError: connection failed: connection to server at "::1", port 5432 failed: could not receive data from server: Connection refused
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5432, hostaddr: '127.0.0.1': connection failed: connection to server at "127.0.0.1", port 5432 failed: could not receive data from server: Connection refused
+- host: 'localhost', port: 5432, hostaddr: '::1': connection failed: connection to server at "::1", port 5432 failed: could not receive data from server: Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/starlette/routing.py", line 638, in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+               ~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/mach0/.local/share/uv/python/cpython-3.14.5-macos-aarch64-none/lib/python3.14/contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/fastapi/routing.py", line 232, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/mach0/.local/share/uv/python/cpython-3.14.5-macos-aarch64-none/lib/python3.14/contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/fastapi/routing.py", line 232, in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ~~~~~~~~~~~~~~~~^^^^^
+  File "/Users/mach0/.local/share/uv/python/cpython-3.14.5-macos-aarch64-none/lib/python3.14/contextlib.py", line 214, in __aenter__
+    return await anext(self.gen)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/app/main.py", line 37, in lifespan
+    Base.metadata.create_all(bind=engine)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/sql/schema.py", line 5930, in create_all
+    bind._run_ddl_visitor(
+    ~~~~~~~~~~~~~~~~~~~~~^
+        ddl.SchemaGenerator, self, checkfirst=checkfirst, tables=tables
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 3269, in _run_ddl_visitor
+    with self.begin() as conn:
+         ~~~~~~~~~~^^
+  File "/Users/mach0/.local/share/uv/python/cpython-3.14.5-macos-aarch64-none/lib/python3.14/contextlib.py", line 141, in __enter__
+    return next(self.gen)
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 3259, in begin
+    with self.connect() as conn:
+         ~~~~~~~~~~~~^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 3295, in connect
+    return self._connection_cls(self)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 146, in __init__
+    Connection._handle_dbapi_exception_noconnection(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        err, dialect, engine
+        ^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 2450, in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 144, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/engine/base.py", line 3319, in raw_connection
+    return self.pool.connect()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/base.py", line 448, in connect
+    return _ConnectionFairy._checkout(self)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/base.py", line 1272, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/base.py", line 712, in checkout
+    rec = pool._do_get()
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/impl.py", line 178, in _do_get
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/util/langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/impl.py", line 176, in _do_get
+    return self._create_connection()
+           ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/base.py", line 389, in _create_connection
+    return _ConnectionRecord(self)
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/base.py", line 674, in __init__
+    self.__connect()
+    ~~~~~~~~~~~~~~^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/base.py", line 900, in __connect
+    with util.safe_reraise():
+         ~~~~~~~~~~~~~~~~~^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/util/langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/pool/base.py", line 896, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/engine/create.py", line 667, in connect
+    return dialect.connect(*cargs_tup, **cparams)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/Users/mach0/Projects/ML-Projects/Vision-Based-Smart-Inventory-Detection-System/backend/.venv/lib/python3.14/site-packages/psycopg/connection.py", line 130, in connect
+    raise new_ex.with_traceback(None)
+sqlalchemy.exc.OperationalError: (psycopg.OperationalError) connection failed: connection to server at "::1", port 5432 failed: could not receive data from server: Connection refused
+Multiple connection attempts failed. All failures were:
+- host: 'localhost', port: 5432, hostaddr: '127.0.0.1': connection failed: connection to server at "127.0.0.1", port 5432 failed: could not receive data from server: Connection refused
+- host: 'localhost', port: 5432, hostaddr: '::1': connection failed: connection to server at "::1", port 5432 failed: could not receive data from server: Connection refused
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+ERROR:    Application startup failed. Exiting.

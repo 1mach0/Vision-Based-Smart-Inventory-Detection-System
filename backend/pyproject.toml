@@ -1,0 +1,75 @@
+# Project + dependency definition, managed with uv (https://docs.astral.sh/uv/).
+#
+# Common commands (run from this backend/ directory):
+#   uv sync                     create .venv and install all deps (incl. dev)
+#   uv sync --no-dev            runtime deps only (e.g. for production images)
+#   uv run vision-inventory ... run the app's CLI inside the managed env
+#   uv run pytest               run the test suite
+#   uv add <package>            add a dependency and update the lockfile
+#
+# `uv sync` resolves everything into uv.lock for reproducible installs.
+
+[project]
+name = "vision-inventory"
+version = "0.1.0"
+description = "Camera images of inventory racks -> object detection + OCR -> confidence-aware inventory records."
+requires-python = ">=3.10"
+
+dependencies = [
+    # Web API
+    "fastapi",
+    "uvicorn[standard]",
+    "python-multipart",     # multipart/form-data uploads
+    "pydantic",
+    "pydantic-settings",
+    # Persistence
+    "sqlalchemy",
+    "psycopg[binary]",      # PostgreSQL driver
+    # Vision
+    "ultralytics",          # YOLO
+    "torch",                # pinned to CPU wheels on Linux (see [tool.uv.sources])
+    "torchvision",
+    "pytesseract",          # Tesseract OCR bindings (needs system tesseract-ocr)
+    "opencv-python-headless",
+    "numpy",
+    "pillow",
+]
+
+[dependency-groups]
+# uv installs the `dev` group by default with `uv sync`; exclude it in
+# production images with `uv sync --no-dev`.
+dev = [
+    "pytest",
+    "httpx",                # FastAPI TestClient transport
+]
+
+[project.scripts]
+# Exposes the CLI as a real command after `uv sync`:
+#   uv run vision-inventory demo
+vision-inventory = "app.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+# Which top-level packages make up the installable project.
+packages = ["app", "scripts"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+# --- CPU-only PyTorch -------------------------------------------------------
+# By default, PyPI's torch wheels for Linux bundle the full CUDA/GPU stack
+# (~2 GB of NVIDIA libraries) — useless on a laptop with no NVIDIA GPU and the
+# reason the Docker build was huge. We pull torch/torchvision from PyTorch's
+# CPU-only wheel index instead, but ONLY on Linux (the Docker image). On macOS,
+# PyPI's default wheels are already CPU/MPS builds, so we leave them alone.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+torchvision = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]

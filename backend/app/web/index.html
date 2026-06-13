@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vision Inventory</title>
+  <!--
+    Single-file dashboard: HTML + CSS + vanilla JS, no build step.
+    It is served by FastAPI at "/", so every fetch below is same-origin
+    (http://localhost:8000) and needs no CORS or dev-server proxy.
+    Kept dependency-free on purpose — the point of this project is the vision
+    + backend pipeline, not a frontend framework.
+  -->
+  <style>
+    :root {
+      --bg: #0f172a;            /* slate-900 */
+      --panel: #1e293b;         /* slate-800 */
+      --panel-2: #273449;
+      --border: #334155;        /* slate-700 */
+      --text: #e2e8f0;          /* slate-200 */
+      --muted: #94a3b8;         /* slate-400 */
+      --accent: #38bdf8;        /* sky-400  */
+      --apply: #22c55e;         /* green-500 */
+      --review: #f59e0b;        /* amber-500 */
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, #17233b 0%, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      padding: 28px 24px;
+      background: linear-gradient(120deg, #0ea5e9 0%, #6366f1 100%);
+      box-shadow: var(--shadow);
+    }
+    header h1 { margin: 0; font-size: 1.6rem; letter-spacing: .3px; }
+    header p { margin: 6px 0 0; opacity: .9; font-size: .9rem; }
+    main {
+      max-width: 980px;
+      margin: -28px auto 40px;
+      padding: 0 20px;
+      display: grid;
+      gap: 20px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+    }
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .count-pill {
+      font-size: .75rem;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 2px 10px;
+      border-radius: 999px;
+    }
+    /* Upload / dropzone */
+    .drop {
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      padding: 26px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .drop:hover, .drop.drag { border-color: var(--accent); background: var(--panel-2); }
+    .drop strong { color: var(--accent); }
+    .drop input { display: none; }
+    .status { margin-top: 12px; font-size: .9rem; color: var(--muted); min-height: 1.2em; }
+    .summary { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .chip { padding: 6px 12px; border-radius: 10px; font-size: .82rem; border: 1px solid var(--border); }
+    .chip.apply { color: var(--apply); border-color: color-mix(in srgb, var(--apply) 45%, var(--border)); }
+    .chip.review { color: var(--review); border-color: color-mix(in srgb, var(--review) 45%, var(--border)); }
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .5px; }
+    tbody tr:hover { background: var(--panel-2); }
+    .qty { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--accent); }
+    .empty { color: var(--muted); font-style: italic; padding: 10px 2px; }
+    /* Review list */
+    .review-item {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--review);
+      border-radius: 10px;
+      padding: 10px 14px; margin-bottom: 8px; font-size: .9rem;
+    }
+    .review-item .badge { color: var(--review); font-size: .78rem; }
+    .row { display: flex; gap: 20px; flex-wrap: wrap; }
+    .row > .card { flex: 1 1 320px; }
+    footer { text-align: center; color: var(--muted); font-size: .78rem; padding: 0 0 30px; }
+    button.refresh {
+      background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+      border-radius: 10px; padding: 8px 14px; cursor: pointer; font-size: .85rem;
+    }
+    button.refresh:hover { border-color: var(--accent); color: var(--accent); }
+    .toolbar { display: flex; justify-content: flex-end; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📦 Vision Inventory</h1>
+    <p>Camera frames → object detection + OCR → confidence-aware inventory</p>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <button class="refresh" onclick="refresh()">↻ Refresh</button>
+    </div>
+
+    <!-- Upload -->
+    <section class="card">
+      <h2>Scan a rack image</h2>
+      <label class="drop" id="drop">
+        <div><strong>Click to choose</strong> or drop an image here</div>
+        <div style="font-size:.8rem;color:var(--muted);margin-top:6px">
+          runs YOLO + Tesseract, then reconciles by confidence
+        </div>
+        <input type="file" id="file" accept="image/*" />
+      </label>
+      <div class="status" id="status"></div>
+      <div class="summary" id="summary"></div>
+    </section>
+
+    <div class="row">
+      <!-- Products -->
+      <section class="card">
+        <h2>Products <span class="count-pill" id="product-count">0</span></h2>
+        <table>
+          <thead><tr><th>SKU</th><th>Name</th><th>Qty</th></tr></thead>
+          <tbody id="products"></tbody>
+        </table>
+        <div class="empty" id="products-empty" hidden>No products yet.</div>
+      </section>
+
+      <!-- Review queue -->
+      <section class="card">
+        <h2>Pending review <span class="count-pill" id="review-count">0</span></h2>
+        <div id="review"></div>
+        <div class="empty" id="review-empty" hidden>Nothing awaiting review.</div>
+      </section>
+    </div>
+
+    <footer>Vision Inventory System · served by FastAPI on localhost:8000</footer>
+  </main>
+
+  <script>
+    // --- API helpers -------------------------------------------------------
+    const $ = (id) => document.getElementById(id);
+
+    async function refresh() {
+      // Both reads run in parallel; endpoints are same-origin.
+      const [products, review] = await Promise.all([
+        fetch("/inventory/products").then((r) => r.json()),
+        fetch("/inventory/review").then((r) => r.json()),
+      ]);
+      renderProducts(products);
+      renderReview(review);
+    }
+
+    function renderProducts(products) {
+      $("product-count").textContent = products.length;
+      $("products-empty").hidden = products.length > 0;
+      $("products").innerHTML = products
+        .map(
+          (p) =>
+            `<tr><td>${esc(p.sku)}</td><td>${esc(p.name)}</td>` +
+            `<td class="qty">${p.quantity}</td></tr>`
+        )
+        .join("");
+    }
+
+    function renderReview(items) {
+      $("review-count").textContent = items.length;
+      $("review-empty").hidden = items.length > 0;
+      $("review").innerHTML = items
+        .map(
+          (c) =>
+            `<div class="review-item"><span>change #${c.id} · observation ${c.observation_id} · Δ${c.delta}</span>` +
+            `<span class="badge">● review</span></div>`
+        )
+        .join("");
+    }
+
+    // --- Upload ------------------------------------------------------------
+    async function upload(file) {
+      if (!file) return;
+      $("status").textContent = "Processing " + file.name + " …";
+      $("summary").innerHTML = "";
+      const body = new FormData();
+      body.append("image", file);
+      try {
+        const res = await fetch("/inference/observe", { method: "POST", body });
+        const data = await res.json();
+        $("status").textContent = "Done.";
+        $("summary").innerHTML =
+          `<span class="chip">${data.observations} observed</span>` +
+          `<span class="chip apply">${data.applied} applied</span>` +
+          `<span class="chip review">${data.review} to review</span>`;
+        refresh();
+      } catch (e) {
+        $("status").textContent = "Upload failed: " + e;
+      }
+    }
+
+    // File input + drag/drop wiring.
+    const drop = $("drop");
+    $("file").addEventListener("change", (e) => upload(e.target.files[0]));
+    ["dragover", "dragenter"].forEach((ev) =>
+      drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("drag"); })
+    );
+    ["dragleave", "drop"].forEach((ev) =>
+      drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("drag"); })
+    );
+    drop.addEventListener("drop", (e) => upload(e.dataTransfer.files[0]));
+
+    // Basic HTML escaping so OCR'd text can't inject markup.
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, (c) =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+      );
+    }
+
+    refresh(); // Populate on load (shows seeded demo data immediately).
+  </script>
+</body>
+</html>

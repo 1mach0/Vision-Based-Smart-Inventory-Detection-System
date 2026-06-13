@@ -1,0 +1,16 @@
+# Keep the build context small and avoid copying host-specific junk into the
+# image (the local .venv is built for your OS/Python and must not leak in).
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Local demo database — the container seeds/uses its own.
+demo.db
+*.db
+
+# Env files with local secrets.
+.env

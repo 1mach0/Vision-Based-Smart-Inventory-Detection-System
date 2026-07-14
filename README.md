@@ -123,40 +123,54 @@ API + dashboard
 ### Project structure
 
 ```text
+### Project structure
+
+```text
 backend/
-  pyproject.toml
-  app/
-    cli.py                   CLI entry point
-    config.py                environment and .env configuration
-    deps.py                  FastAPI dependency providers
-    main.py                  application setup
+├── pyproject.toml                 # Project metadata, dependencies, and CLI entry point
+├── docker-compose.yml             # API + PostgreSQL services
+│
+├── app/
+│   ├── __init__.py
+│   ├── main.py                    # FastAPI application setup and UI serving
+│   ├── cli.py                     # `vision-inventory` CLI
+│   ├── config.py                  # Environment and .env configuration
+│   ├── deps.py                    # FastAPI dependency providers
+│   │
+│   ├── vision/
+│   │   ├── __init__.py
+│   │   ├── detector.py            # YOLO object detector
+│   │   ├── ocr.py                 # Tesseract OCR
+│   │   └── pipeline.py            # Image → detection → crop → OCR → observations
+│   │
+│   ├── domain/
+│   │   ├── __init__.py
+│   │   └── reconciliation.py      # Confidence-based APPLY / REVIEW logic
+│   │
+│   ├── persistence/
+│   │   ├── __init__.py
+│   │   ├── database.py            # SQLAlchemy engine and session setup
+│   │   ├── models.py              # Database models
+│   │   └── repository.py          # Database access layer
+│   │
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── routes_inference.py    # Image inference endpoint
+│   │   └── routes_inventory.py    # Inventory and review endpoints
+│   │
+│   └── web/
+│       └── index.html             # Single-file dashboard
+│
+├── scripts/
+│   └── seed.py                    # Demo database setup
+│
+└── tests/
+    ├── test_reconciliation.py     # Domain logic
+    ├── test_repository.py         # Persistence behaviour
+    ├── test_pipeline.py           # Vision pipeline with test doubles
+    └── test_api.py                # End-to-end API flows
+```
 
-    vision/
-      detector.py            YOLO wrapper
-      ocr.py                 Tesseract wrapper
-      pipeline.py            image → detection → OCR → observations
-
-    domain/
-      reconciliation.py      apply/review decision logic
-
-    persistence/
-      database.py            SQLAlchemy engine and session setup
-      models.py              database models
-      repository.py          database access layer
-
-    api/
-      routes_inference.py    inference endpoints
-      routes_inventory.py    inventory and review endpoints
-
-    web/
-      index.html             dashboard
-
-  scripts/
-    seed.py                  demo database setup
-
-  tests/                     domain, persistence, pipeline, and API tests
-
-docker-compose.yml           API + PostgreSQL
 ```
 
 The vision pipeline returns `Observation` value objects rather than database or API models. This keeps the detector and OCR implementation separate from the rest of the application and makes both easy to replace with test doubles.
